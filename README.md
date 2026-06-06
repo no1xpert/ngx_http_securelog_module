@@ -68,6 +68,18 @@ This module
 
 ---
 
+## Verification Screenshots
+
+| Step | Screenshot |
+|------|------------|
+| Key generation + SHA-256 fingerprint | ![keygen](docs/screenshots/01_keygen.png) |
+| Key permissions + nginx.conf + nginx -t | ![config](docs/screenshots/02_config.png) |
+| Log directory before/after + encrypted file created | ![logfile](docs/screenshots/03_nginx_test_and_logfile.png) |
+| Encrypted binary (xxd) + decryption | ![encrypt-decrypt](docs/screenshots/04_encrypt_decrypt.png) |
+| Unit tests — 12 PASSED | ![unit-tests](docs/screenshots/05_cmocka_unit_tests.png) |
+
+---
+
 ## Installation
 
 ### 1. Prerequisites
@@ -414,11 +426,29 @@ cd tests && make run
 | Version | Status | Highlights |
 |---------|--------|------------|
 | **v0.9.0-beta** | ✅ Released | AES-256-GCM · GPG · EXT interface · key integrity · 12 unit tests |
-| v1.1 | Planned | **Error log encryption** · env-var KMS · `.deb`/`.rpm` packages · integration tests |
+| v1.1 | Planned | **Error log encryption** · **install.sh** · env-var KMS · `.deb`/`.rpm` packages · integration tests |
 | v2.0 | Planned | KMS Adapter Layer · Vault/AWS/GCP/Azure KMS · envelope encryption · key rotation · **EXT provider implementations** |
 | v2.1 | Commercial | D'Amo KMS Adapter · PKCS#11 HSM Adapter · enterprise dashboard |
 
-### v1.1 — Error Log Encryption (planned)
+### v1.1 — Planned Features
+
+#### install.sh (automated setup)
+
+A one-shot installer that handles directory creation, permissions,
+and key generation:
+
+```bash
+sudo bash install.sh
+
+# What it does:
+#   1. Creates /etc/securelog/ and /var/log/securelog/
+#   2. Sets correct ownership (www-data)
+#   3. Generates aes.key + aes.key.sha256
+#   4. Copies .so to /usr/lib/nginx/modules/
+#   5. Prints nginx.conf snippet to add
+```
+
+#### Error Log Encryption
 
 In addition to access logs, nginx error logs will also be encrypted
 using the same provider (AES-256-GCM / GPG / EXT).
@@ -459,14 +489,3 @@ compliance consulting (GDPR, Korea EFSR/FSS, Korea PIPA), or annual support cont
 
 [BSD 2-Clause](LICENSE) — free for personal and commercial use.  
 Commercial licensing available for enterprise use cases.
-
----
-
-## Verification Screenshots
-
-| Step | Screenshot |
-|------|------------|
-| Key generation + nginx.conf | ![keygen](docs/screenshots/01_keygen_and_config.png) |
-| nginx -t + log file created | ![nginx-test](docs/screenshots/02_nginx_test_and_logfile.png) |
-| Encrypted binary + decryption | ![encrypt-decrypt](docs/screenshots/03_encrypt_decrypt.png) |
-| Unit tests 12 PASSED | ![unit-tests](docs/screenshots/04_unit_tests.png) |

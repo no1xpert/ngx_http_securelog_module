@@ -414,9 +414,31 @@ cd tests && make run
 | Version | Status | Highlights |
 |---------|--------|------------|
 | **v0.9.0-beta** | ✅ Released | AES-256-GCM · GPG · EXT interface · key integrity · 12 unit tests |
-| v1.1 | Planned | Env-var KMS · `.deb`/`.rpm` packages · integration tests |
+| v1.1 | Planned | **Error log encryption** · env-var KMS · `.deb`/`.rpm` packages · integration tests |
 | v2.0 | Planned | KMS Adapter Layer · Vault/AWS/GCP/Azure KMS · envelope encryption · key rotation · **EXT provider implementations** |
 | v2.1 | Commercial | D'Amo KMS Adapter · PKCS#11 HSM Adapter · enterprise dashboard |
+
+### v1.1 — Error Log Encryption (planned)
+
+In addition to access logs, nginx error logs will also be encrypted
+using the same provider (AES-256-GCM / GPG / EXT).
+Each log type can be independently enabled or disabled via directive:
+
+```nginx
+# v1.1 planned configuration
+securelog_provider      aes;
+securelog_aes_keyfile   /etc/securelog/aes.key;
+securelog_dir           /var/log/securelog;
+
+securelog_access_log    on;   # encrypt access log (default: on)
+securelog_error_log     on;   # encrypt error log  (default: off, new in v1.1)
+```
+
+Encrypted output files:
+```
+/var/log/securelog/nginx-YYYYMMDD.log.enc        # access log
+/var/log/securelog/nginx-YYYYMMDD.error.log.enc  # error log (v1.1)
+```
 
 ---
 
@@ -437,3 +459,14 @@ compliance consulting (GDPR, Korea EFSR/FSS, Korea PIPA), or annual support cont
 
 [BSD 2-Clause](LICENSE) — free for personal and commercial use.  
 Commercial licensing available for enterprise use cases.
+
+---
+
+## Verification Screenshots
+
+| Step | Screenshot |
+|------|------------|
+| Key generation + nginx.conf | ![keygen](docs/screenshots/01_keygen_and_config.png) |
+| nginx -t + log file created | ![nginx-test](docs/screenshots/02_nginx_test_and_logfile.png) |
+| Encrypted binary + decryption | ![encrypt-decrypt](docs/screenshots/03_encrypt_decrypt.png) |
+| Unit tests 12 PASSED | ![unit-tests](docs/screenshots/04_unit_tests.png) |

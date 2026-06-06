@@ -17,7 +17,13 @@ run: all
 	@echo "=========================================="
 	@echo " securelog unit tests"
 	@echo "=========================================="
-	@./test_aes_crypto
+	@./test_aes_crypto 2>&1 | awk \
+	'/^\[==========\]/ { print; next } \
+	/^\[ RUN      \]/ { gsub(/\[ RUN      \] /, ""); name = $$0; next } \
+	/^\[       OK \]/ { printf "[ %-45s  OK ]\n", name; next } \
+	/^\[  FAILED  \]/ { printf "[ %-45s FAIL]\n", name; next } \
+	/^\[  PASSED  \]/ { print; next } \
+	{ print }'
 
 clean:
 	rm -f $(TESTS)

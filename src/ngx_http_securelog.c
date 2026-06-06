@@ -396,7 +396,7 @@ securelog_aes_verify_key(const unsigned char *key, size_t key_len,
     if (!hf) {
         /* Hash file absent - skip verification, log a warning */
         ngx_log_error(NGX_LOG_WARN, log, 0,
-                      "securelog/aes: no hash file found at "%s" "
+                      "securelog/aes: no hash file found at %s "
                       "- key integrity not verified. "
                       "Run securelog_keygen.sh to generate both files.",
                       hashfile);
@@ -407,7 +407,7 @@ securelog_aes_verify_key(const unsigned char *key, size_t key_len,
     if (fscanf(hf, "%64s", stored_hex) != 1) {
         fclose(hf);
         ngx_log_error(NGX_LOG_ERR, log, 0,
-                      "securelog/aes: cannot parse hash file "%s"",
+                      "securelog/aes: cannot parse hash file %s",
                       hashfile);
         return NGX_ERROR;
     }
@@ -423,7 +423,7 @@ securelog_aes_verify_key(const unsigned char *key, size_t key_len,
     /* Constant-time comparison to avoid timing side-channel */
     if (CRYPTO_memcmp(stored_hex, computed_hex, 64) != 0) {
         ngx_log_error(NGX_LOG_EMERG, log, 0,
-                      "securelog/aes: KEY INTEGRITY CHECK FAILED for "%s" "
+                      "securelog/aes: KEY INTEGRITY CHECK FAILED for %s "
                       "- stored hash does not match. "
                       "Key file may have been tampered with. "
                       "Worker startup aborted.",

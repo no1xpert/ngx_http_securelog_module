@@ -1,0 +1,18 @@
+# Build artifacts
+tests/test_aes_crypto
+tools/securelog_aes_decrypt
+*.o
+*.so
+*.a
+
+# Keys — never commit
+*.key
+*.pem
+*.gpg
+aes.key
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~

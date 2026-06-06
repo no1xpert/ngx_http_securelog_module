@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ── Job 1: CMocka Unit Tests ──────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests (CMocka)
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q \
+            libcmocka-dev libssl-dev libgpgme-dev \
+            pkg-config gcc make
+
+      - name: Build tests
+        run: make -C tests all
+
+      - name: Run tests
+        run: make -C tests run
+
+      - name: Upload test binary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: tests/test_aes_crypto
+
+  # ── Job 2: Build Module (matrix: multiple NGINX versions) ─────────────────
+  build-module:
+    name: Build Module (NGINX ${{ matrix.nginx_version }})
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        nginx_version: ["1.26.3", "1.28.0"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q \
+            libssl-dev libgpgme-dev \
+            libpcre2-dev zlib1g-dev \
+            pkg-config gcc make wget
+
+      - name: Download nginx ${{ matrix.nginx_version }} source
+        run: |
+          wget -q https://nginx.org/download/nginx-${{ matrix.nginx_version }}.tar.gz
+          tar zxf nginx-${{ matrix.nginx_version }}.tar.gz
+
+      - name: Configure and build module
+        run: |
+          cd nginx-${{ matrix.nginx_version }}
+          ./configure \
+            --with-compat \
+            --add-dynamic-module=.. \
+            --with-http_ssl_module
+          make modules
+
+      - name: Verify .so output
+        run: |
+          ls -lh nginx-${{ matrix.nginx_version }}/objs/ngx_http_securelog.so
+          file nginx-${{ matrix.nginx_version }}/objs/ngx_http_securelog.so
+
+      - name: Upload .so artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: module-nginx-${{ matrix.nginx_version }}
+          path: nginx-${{ matrix.nginx_version }}/objs/ngx_http_securelog.so
+
+  # ── Job 3: Build Decrypt Tool ─────────────────────────────────────────────
+  build-tools:
+    name: Build Tools
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get install -y -q libssl-dev gcc
+
+      - name: Build securelog_aes_decrypt
+        run: |
+          gcc -O2 -Wall -o securelog_aes_decrypt \
+              tools/securelog_aes_decrypt.c -lcrypto
+          ./securelog_aes_decrypt 2>&1 | grep -q "Usage:" && echo "Tool OK"

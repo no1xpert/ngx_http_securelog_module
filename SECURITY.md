@@ -8,5 +8,5 @@
 ## Reporting a Vulnerability
 Please do NOT open a public GitHub issue for security vulnerabilities.
 
-Email: bongshin@bzlab.dev
+Email: no1xpert@bzlab.dev
 Expected response: within 5 business days

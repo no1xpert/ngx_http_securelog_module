@@ -426,7 +426,7 @@ cd tests && make run
 | Version | Status | Highlights |
 |---------|--------|------------|
 | **v0.9.0-beta** | ✅ Released | AES-256-GCM · GPG · EXT interface · key integrity · 12 unit tests |
-| v1.1 | Planned | **Error log encryption** · **install.sh** · env-var KMS · `.deb`/`.rpm` packages · integration tests |
+| v1.0 | Planned | **Error log encryption** · **install.sh** · env-var KMS · `.deb`/`.rpm` packages · integration tests |
 | v2.0 | Planned | KMS Adapter Layer · Vault/AWS/GCP/Azure KMS · envelope encryption · key rotation · **EXT provider implementations** |
 | v2.1 | Commercial | D'Amo KMS Adapter · PKCS#11 HSM Adapter · enterprise dashboard |
 
